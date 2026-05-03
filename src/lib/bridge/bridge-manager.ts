@@ -818,7 +818,7 @@ async function handleCommand(
         'Send any message to interact with Claude.',
         '',
         '<b>Commands:</b>',
-        '/new [path] - Start new session',
+        '/new [path] - Start new session (omit path → keep current chat cwd)',
         '/bind &lt;session_id&gt; - Bind to existing session',
         '/cwd /path - Change working directory',
         '/mode plan|code|ask - Change mode',
@@ -848,6 +848,14 @@ async function handleCommand(
           break;
         }
         workDir = validated;
+      } else {
+        // No path: keep this chat's current working directory (from /cwd or previous /new /path),
+        // not bridge_default_work_dir / CTI_DEFAULT_WORKDIR unless nothing valid is stored.
+        const preservedRaw = oldBinding.workingDirectory;
+        if (preservedRaw) {
+          const validated = validateWorkingDirectory(preservedRaw);
+          if (validated) workDir = validated;
+        }
       }
       const binding = router.createBinding(msg.address, workDir);
       response = `New session created.\nSession: <code>${binding.codepilotSessionId.slice(0, 8)}...</code>\nCWD: <code>${escapeHtml(binding.workingDirectory || '~')}</code>`;
@@ -965,7 +973,7 @@ async function handleCommand(
       response = [
         '<b>CodePilot Bridge Commands</b>',
         '',
-        '/new [path] - Start new session',
+        '/new [path] - Start new session (omit path → keep current chat cwd)',
         '/bind &lt;session_id&gt; - Bind to existing session',
         '/cwd /path - Change working directory',
         '/mode plan|code|ask - Change mode',

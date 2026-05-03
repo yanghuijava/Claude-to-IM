@@ -344,7 +344,7 @@ export class TelegramAdapter extends BaseChannelAdapter {
 
     await callTelegramApi(token, 'setMyCommands', {
       commands: [
-        { command: 'new', description: 'Start new session (optionally specify path)' },
+        { command: 'new', description: 'Start new session (optional path; omit = keep chat cwd)' },
         { command: 'bind', description: 'Bind to existing session' },
         { command: 'cwd', description: 'Change working directory' },
         { command: 'mode', description: 'Switch mode: plan / code / ask' },
